@@ -6,7 +6,7 @@ import {
   ChevronLeft, ChevronRight, Maximize2
 } from 'lucide-react';
 
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = 'https://wajeez-amaal.onrender.com/api';
 const HERO_BG = "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1920&q=80";
 
 export default function App() {
@@ -469,7 +469,7 @@ export default function App() {
                           className="group relative aspect-[4/3] overflow-hidden bg-slate-950 border border-slate-800 rounded-xl cursor-pointer hover:border-yellow-500/80 hover:shadow-lg hover:shadow-yellow-500/10 transition-all duration-300"
                         >
                           <img 
-                            src={`http://localhost:5000${img.image_url}`} 
+                            src={`https://wajeez-amaal.onrender.com${img.image_url}`} 
                             alt={album.title}
                             className="w-full h-full object-cover group-hover:scale-110 transition duration-500 ease-out"
                           />
@@ -542,7 +542,7 @@ export default function App() {
             {/* Displayed Image */}
             <div className="relative max-h-[75vh] max-w-full flex items-center justify-center overflow-hidden rounded-2xl border border-slate-800 shadow-2xl bg-black/40">
               <img 
-                src={`http://localhost:5000${lightbox.images[lightbox.currentIndex]?.image_url}`} 
+                src={`https://wajeez-amaal.onrender.com${lightbox.images[lightbox.currentIndex]?.image_url}`} 
                 alt="معاينة المكبّرة" 
                 className="max-h-[75vh] max-w-full object-contain transition-all duration-300"
               />
@@ -574,7 +574,7 @@ export default function App() {
                   }`}
                 >
                   <img 
-                    src={`http://localhost:5000${img.image_url}`} 
+                    src={`https://wajeez-amaal.onrender.com${img.image_url}`} 
                     alt="صورة مصغرة" 
                     className="w-full h-full object-cover"
                   />
