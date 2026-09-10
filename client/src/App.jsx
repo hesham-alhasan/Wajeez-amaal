@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Navbar from './components/Navbar';
 import axios from 'axios';
 import { 
   Building2, HardHat, Hammer, Phone, Mail, 
@@ -222,37 +223,14 @@ export default function App() {
     <div dir="rtl" className="min-h-screen bg-[#0b0f17] text-slate-100 font-sans scroll-smooth">
       
       {/* Navbar */}
-      <nav className="border-b border-slate-800/80 bg-[#0b0f17]/95 backdrop-blur-md sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-6 py-3 flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <img src="/logo.png" alt="شعار الشركة" className="h-20 md:h-24 w-auto object-contain drop-shadow-md" />
-            <span className="text-2xl md:text-3xl font-black tracking-wide text-yellow-500">
-              وجيز الآمال للمقاولات
-            </span>
-          </div>
+      {/* Navbar Component */}
+      <Navbar 
+        token={token} 
+        username={username} 
+        handleLogout={handleLogout} 
+        setShowLogin={setShowLogin} 
+      />
           
-          <div className="flex items-center gap-8 font-semibold text-sm">
-            <a href="#about" className="hover:text-yellow-500 transition">قصتنا</a>
-            <a href="#services" className="hover:text-yellow-500 transition">خدماتنا</a>
-            <a href="#projects" className="hover:text-yellow-500 transition">مشاريعنا</a>
-            <a href="#quote" className="hover:text-yellow-500 transition">طلب استشارة</a>
-            
-            {token ? (
-              <div className="flex items-center gap-3 bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-700">
-                <span className="text-xs text-yellow-500">مرحباً، {username}</span>
-                <button onClick={handleLogout} className="text-rose-400 hover:text-rose-300 p-1" title="تسجيل الخروج">
-                  <LogOut className="w-4 h-4" />
-                </button>
-              </div>
-            ) : (
-              <button onClick={() => setShowLogin(true)} className="flex items-center gap-1.5 text-slate-400 hover:text-yellow-500 transition text-xs">
-                <Lock className="w-3.5 h-3.5" />
-                <span>دخول المشرفين</span>
-              </button>
-            )}
-          </div>
-        </div>
-      </nav>
 
       {/* Hero Section */}
       <header className="relative min-h-[90vh] flex items-center justify-center overflow-hidden border-b border-slate-800">
