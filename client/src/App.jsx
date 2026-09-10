@@ -4,7 +4,7 @@ import axios from 'axios';
 import { 
   Building2, HardHat, Hammer, Phone, Mail, 
   Lock, LogOut, Plus, Upload, Send, X, ArrowLeft, ArrowDownLeft, Check, Trash2, Images,
-  ChevronLeft, ChevronRight, Maximize2
+  ChevronLeft, ChevronRight, Maximize2, FileText, ExternalLink, UserCheck
 } from 'lucide-react';
 
 const API_BASE = 'https://wajeez-amaal.onrender.com/api';
@@ -37,10 +37,19 @@ export default function App() {
   const [quoteForm, setQuoteForm] = useState({ client_name: '', phone: '', notes: '' });
   const [quoteFile, setQuoteFile] = useState(null);
   const [quoteStatus, setQuoteStatus] = useState('');
+  const [quoteRequests, setQuoteRequests] = useState([]);
 
   useEffect(() => {
     fetchAlbums();
   }, []);
+
+  useEffect(() => {
+    if (token) {
+      fetchQuoteRequests();
+    } else {
+      setQuoteRequests([]);
+    }
+  }, [token]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -59,6 +68,29 @@ export default function App() {
       setAlbums(res.data);
     } catch (err) {
       console.error('خطأ في جلب الألبومات:', err);
+    }
+  };
+
+  const fetchQuoteRequests = async () => {
+    try {
+      const res = await axios.get(`${API_BASE}/quote-requests`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setQuoteRequests(res.data);
+    } catch (err) {
+      console.error('خطأ في جلب طلبات الاستشارة:', err);
+    }
+  };
+
+  const handleDeleteQuoteRequest = async (id) => {
+    if (!window.confirm('هل أنت متأكد من حذف هذا الطلب؟')) return;
+    try {
+      await axios.delete(`${API_BASE}/quote-requests/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setQuoteRequests(prev => prev.filter(q => q.id !== id));
+    } catch (err) {
+      alert(err.response?.data?.error || 'خطأ في حذف الطلب');
     }
   };
 
@@ -204,6 +236,7 @@ export default function App() {
       setQuoteStatus(res.data.message);
       setQuoteForm({ client_name: '', phone: '', notes: '' });
       setQuoteFile(null);
+      if (token) fetchQuoteRequests();
     } catch (err) {
       setQuoteStatus('حدث خطأ أثناء إرسال الطلب');
     }
@@ -442,6 +475,85 @@ export default function App() {
         </div>
       </section>
 
+      {/* ADMIN ONLY: Quote Requests Dashboard Section */}
+      {token && (
+        <section className="py-20 px-6 max-w-7xl mx-auto w-full border-t border-yellow-500/30">
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-3">
+              <UserCheck className="w-8 h-8 text-yellow-500" />
+              <div>
+                <h2 className="text-2xl font-black text-yellow-500">لوحة تحكم المشرف: طلبات الاستشارة الواردة</h2>
+                <p className="text-slate-400 text-xs mt-1">عرض ومتابعة طلبات المشاريع والمخططات المرسلة من العملاء</p>
+              </div>
+            </div>
+            <span className="bg-yellow-500/10 border border-yellow-500/30 text-yellow-500 text-xs px-4 py-2 rounded-lg font-bold">
+              إجمالي الطلبات: {quoteRequests.length}
+            </span>
+          </div>
+
+          {quoteRequests.length === 0 ? (
+            <div className="text-center py-12 bg-[#0f1523] border border-slate-800 rounded-2xl">
+              <p className="text-slate-400 text-sm">لا توجد طلبات استشارة جديدة حالياً.</p>
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-2 gap-6">
+              {quoteRequests.map((req) => (
+                <div key={req.id} className="bg-[#0f1523] border border-slate-800 hover:border-yellow-500/40 p-6 rounded-2xl shadow-xl flex flex-col justify-between transition">
+                  <div>
+                    <div className="flex justify-between items-start gap-4 mb-4 pb-4 border-b border-slate-800">
+                      <div>
+                        <h3 className="text-lg font-bold text-white">{req.client_name}</h3>
+                        <p className="text-xs text-yellow-500 font-mono mt-1 flex items-center gap-1.5">
+                          <Phone className="w-3.5 h-3.5" />
+                          <a href={`https://wa.me/${req.phone}`} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                            {req.phone} (مراسلة واتساب)
+                          </a>
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => handleDeleteQuoteRequest(req.id)}
+                        className="bg-rose-950/40 hover:bg-rose-900/60 text-rose-400 border border-rose-800/60 p-2 rounded-lg transition"
+                        title="حذف الطلب"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+
+                    <div className="mb-6">
+                      <span className="text-[11px] font-bold text-slate-400 block mb-1">تفاصيل وملاحظات المشروع:</span>
+                      <p className="text-sm text-slate-200 bg-[#0b0f17] p-4 rounded-xl border border-slate-800/80 leading-relaxed whitespace-pre-wrap">
+                        {req.notes || 'لا توجد ملاحظات إضافية.'}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-4 border-t border-slate-800 text-xs">
+                    <span className="text-slate-500 font-mono">
+                      {new Date(req.created_at || Date.now()).toLocaleDateString('ar-SA', { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                    {req.file_url ? (
+                      <a 
+                        href={req.file_url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="bg-yellow-500/10 hover:bg-yellow-500/20 text-yellow-500 border border-yellow-500/30 px-4 py-2 rounded-lg flex items-center gap-2 transition font-bold"
+                      >
+                        <FileText className="w-4 h-4" />
+                        <span>عرض المخطط المرفق</span>
+                        <ExternalLink className="w-3.5 h-3.5" />
+                      </a>
+                    ) : (
+                      <span className="text-slate-500 italic">لا يوجد ملف مرفق</span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+      )}
+
+      {/* Lightbox / Phone Gallery Fullscreen Viewer */}
       {lightbox.isOpen && (
         <div 
           className="fixed inset-0 bg-slate-950/95 backdrop-blur-lg z-50 flex flex-col justify-between p-4 md:p-6 select-none animate-fadeIn"
@@ -718,4 +830,3 @@ export default function App() {
     </div>
   );
 }
-
