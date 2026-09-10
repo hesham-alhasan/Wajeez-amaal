@@ -15,7 +15,6 @@ export default function App() {
   const [token, setToken] = useState(localStorage.getItem('adminToken') || '');
   const [username, setUsername] = useState(localStorage.getItem('adminUser') || '');
   
-  // Modals & States
   const [showLogin, setShowLogin] = useState(false);
   const [loginCreds, setLoginCreds] = useState({ username: '', password: '' });
   const [loginError, setLoginError] = useState('');
@@ -26,10 +25,8 @@ export default function App() {
   const [selectedAlbumForUpload, setSelectedAlbumForUpload] = useState(null);
   const [uploadFiles, setUploadFiles] = useState([]);
 
-  // Active Album Filter
   const [activeAlbumId, setActiveAlbumId] = useState('ALL');
 
-  // Lightbox / Photo Studio State
   const [lightbox, setLightbox] = useState({
     isOpen: false,
     images: [],
@@ -37,7 +34,6 @@ export default function App() {
     albumTitle: ''
   });
 
-  // Quote Form State
   const [quoteForm, setQuoteForm] = useState({ client_name: '', phone: '', notes: '' });
   const [quoteFile, setQuoteFile] = useState(null);
   const [quoteStatus, setQuoteStatus] = useState('');
@@ -46,7 +42,6 @@ export default function App() {
     fetchAlbums();
   }, []);
 
-  // Keyboard navigation for Lightbox (Right/Left arrows & Esc)
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (!lightbox.isOpen) return;
@@ -67,7 +62,6 @@ export default function App() {
     }
   };
 
-  // Lightbox Handlers
   const openLightbox = (images, index, albumTitle) => {
     setLightbox({
       isOpen: true,
@@ -221,23 +215,15 @@ export default function App() {
 
   return (
     <div dir="rtl" className="min-h-screen bg-[#0b0f17] text-slate-100 font-sans scroll-smooth">
-      
-      {/* Navbar */}
-      {/* Navbar Component */}
       <Navbar 
         token={token} 
         username={username} 
         handleLogout={handleLogout} 
         setShowLogin={setShowLogin} 
       />
-          
 
-      {/* Hero Section */}
       <header className="relative min-h-[90vh] flex items-center justify-center overflow-hidden border-b border-slate-800">
-        <div 
-          className="absolute inset-0 bg-cover bg-center z-0"
-          style={{ backgroundImage: `url(${HERO_BG})` }}
-        >
+        <div className="absolute inset-0 bg-cover bg-center z-0" style={{ backgroundImage: `url(${HERO_BG})` }}>
           <div className="absolute inset-0 bg-gradient-to-r from-[#0b0f17] via-[#0b0f17]/85 to-[#0b0f17]/40" />
           <div className="absolute inset-0 bg-gradient-to-t from-[#0b0f17] via-transparent to-[#0b0f17]/60" />
         </div>
@@ -247,20 +233,12 @@ export default function App() {
             <div className="bg-[#0f1523]/80 border border-yellow-500/40 backdrop-blur-md rounded-xl p-8 max-w-sm shadow-2xl relative overflow-hidden group hover:border-yellow-500 transition">
               <div className="flex justify-between items-center text-xs text-yellow-500/80 tracking-widest font-mono mb-8">
                 <span>W.A / 2026</span>
-                <div className="w-6 h-6 border border-yellow-500/40 rounded-full flex items-center justify-center text-[10px]">
-                  ⌖
-                </div>
+                <div className="w-6 h-6 border border-yellow-500/40 rounded-full flex items-center justify-center text-[10px]">⌖</div>
               </div>
-
               <div className="text-center my-6">
-                <span className="text-7xl font-extrabold text-yellow-500 tracking-tight block">
-                  ١٠
-                </span>
-                <p className="text-lg font-bold text-slate-200 mt-2">
-                  أعوام من البناء المتقن
-                </p>
+                <span className="text-7xl font-extrabold text-yellow-500 tracking-tight block">١٠</span>
+                <p className="text-lg font-bold text-slate-200 mt-2">أعوام من البناء المتقن</p>
               </div>
-
               <div className="border-t border-slate-700/60 pt-4 mt-6">
                 <p className="text-xs text-slate-400 leading-relaxed text-center">
                   يقاس نجاحنا بما يبقى بعد أن ننصرف.
@@ -304,17 +282,6 @@ export default function App() {
                 <span>شاهد أعمالنا</span>
                 <ArrowDownLeft className="w-5 h-5 text-yellow-500 group-hover:translate-x-[-2px] group-hover:translate-y-[2px] transition" />
               </a>
-            </div>
-
-            <div className="pt-8 flex flex-wrap items-center gap-8 border-t border-slate-800/80 text-xs font-semibold text-slate-400">
-              <div className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-yellow-500" />
-                <span>ضمان مكتوب على الأعمال</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-yellow-500" />
-                <span>مهندس مشروع مخصص</span>
-              </div>
             </div>
           </div>
         </div>
@@ -362,7 +329,6 @@ export default function App() {
             )}
           </div>
 
-          {/* Album Selection Tabs */}
           {albums.length > 0 && (
             <div className="flex items-center gap-3 overflow-x-auto pb-4 mb-8 border-b border-slate-800">
               <button
@@ -405,7 +371,6 @@ export default function App() {
               {displayedAlbums.map((album) => (
                 <div key={album.album_id} className="bg-[#0f1523] border border-slate-800 p-6 rounded-2xl shadow-xl">
                   
-                  {/* Header of Album */}
                   <div className="flex justify-between items-center mb-6 border-b border-slate-800/80 pb-4">
                     <div className="flex items-center gap-3">
                       <h3 className="text-2xl font-bold text-yellow-500">{album.title}</h3>
@@ -435,7 +400,6 @@ export default function App() {
                     )}
                   </div>
 
-                  {/* Album Grid (Smartphone Gallery Style) */}
                   {album.images.length === 0 ? (
                     <p className="text-slate-500 text-xs py-6 text-center">لا توجد صور مضافة في هذا الألبوم بعد.</p>
                   ) : (
@@ -447,19 +411,17 @@ export default function App() {
                           className="group relative aspect-[4/3] overflow-hidden bg-slate-950 border border-slate-800 rounded-xl cursor-pointer hover:border-yellow-500/80 hover:shadow-lg hover:shadow-yellow-500/10 transition-all duration-300"
                         >
                           <img 
-                            src={`https://wajeez-amaal.onrender.com${img.image_url}`} 
+                            src={img.image_url} 
                             alt={album.title}
                             className="w-full h-full object-cover group-hover:scale-110 transition duration-500 ease-out"
                           />
                           
-                          {/* Hover Zoom Overlay */}
                           <div className="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition duration-300">
                             <div className="bg-yellow-500 text-slate-950 p-3 rounded-full transform translate-y-3 group-hover:translate-y-0 transition duration-300 shadow-xl">
                               <Maximize2 className="w-5 h-5" />
                             </div>
                           </div>
 
-                          {/* Delete icon for Admin */}
                           {token && (
                             <button
                               onClick={(e) => handleDeleteImage(e, img.id)}
@@ -480,13 +442,11 @@ export default function App() {
         </div>
       </section>
 
-      {/* Lightbox / Phone Gallery Fullscreen Viewer */}
       {lightbox.isOpen && (
         <div 
           className="fixed inset-0 bg-slate-950/95 backdrop-blur-lg z-50 flex flex-col justify-between p-4 md:p-6 select-none animate-fadeIn"
           onClick={closeLightbox}
         >
-          {/* Top Bar */}
           <div className="flex justify-between items-center text-slate-200 z-10 w-full max-w-6xl mx-auto" onClick={e => e.stopPropagation()}>
             <div>
               <h4 className="font-bold text-yellow-500 text-base md:text-lg">{lightbox.albumTitle}</h4>
@@ -503,10 +463,8 @@ export default function App() {
             </button>
           </div>
 
-          {/* Main Content Area (Image + Left/Right Navigation) */}
           <div className="relative flex-1 flex items-center justify-center my-4 max-w-6xl w-full mx-auto" onClick={e => e.stopPropagation()}>
             
-            {/* Previous Image Button */}
             {lightbox.images.length > 1 && (
               <button 
                 onClick={prevImage}
@@ -517,16 +475,14 @@ export default function App() {
               </button>
             )}
 
-            {/* Displayed Image */}
             <div className="relative max-h-[75vh] max-w-full flex items-center justify-center overflow-hidden rounded-2xl border border-slate-800 shadow-2xl bg-black/40">
               <img 
-                src={`https://wajeez-amaal.onrender.com${lightbox.images[lightbox.currentIndex]?.image_url}`} 
+                src={lightbox.images[lightbox.currentIndex]?.image_url} 
                 alt="معاينة المكبّرة" 
                 className="max-h-[75vh] max-w-full object-contain transition-all duration-300"
               />
             </div>
 
-            {/* Next Image Button */}
             {lightbox.images.length > 1 && (
               <button 
                 onClick={nextImage}
@@ -538,7 +494,6 @@ export default function App() {
             )}
           </div>
 
-          {/* Bottom Thumbnails Strip (Like Phone Gallery) */}
           {lightbox.images.length > 1 && (
             <div className="w-full max-w-3xl mx-auto overflow-x-auto py-2 px-4 flex justify-center gap-2 border-t border-slate-800/80 z-10" onClick={e => e.stopPropagation()}>
               {lightbox.images.map((img, idx) => (
@@ -552,7 +507,7 @@ export default function App() {
                   }`}
                 >
                   <img 
-                    src={`https://wajeez-amaal.onrender.com${img.image_url}`} 
+                    src={img.image_url} 
                     alt="صورة مصغرة" 
                     className="w-full h-full object-cover"
                   />
@@ -763,6 +718,3 @@ export default function App() {
     </div>
   );
 }
-
-
-
