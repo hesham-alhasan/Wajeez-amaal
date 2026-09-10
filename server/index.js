@@ -6,6 +6,8 @@ const multer = require('multer');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const db = require('./db');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const { v2: cloudinary } = require('cloudinary');
 require('dotenv').config();
 
 const app = express();
@@ -15,22 +17,21 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-// تجهيز مجلد رفع الملفات والصور
-const uploadsDir = path.join(__dirname, 'uploads');
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir);
-}
-app.use('/uploads', express.static(uploadsDir));
 
-// إعداد Multer لرفع الملفات والصور
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/');
+// إعداد بيانات الاتصال بـ Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
+// إعداد محرك التخزين السحابي
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'wajeez_projects',
+    allowed_formats: ['jpg', 'jpeg', 'png', 'webp', 'pdf'],
   },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
-  }
 });
 const upload = multer({ storage });
 
@@ -112,7 +113,7 @@ app.post('/api/albums', authenticateAdmin, async (req, res) => {
   }
 });
 
-// 4. رفع صور لألبوم معين (Protected)
+// 4. رفع صور لألبوم معين (Protected - Cloudinary)
 app.post('/api/albums/:id/images', authenticateAdmin, upload.array('images', 10), async (req, res) => {
   const albumId = req.params.id;
   if (!req.files || req.files.length === 0) {
@@ -122,7 +123,7 @@ app.post('/api/albums/:id/images', authenticateAdmin, upload.array('images', 10)
   try {
     const savedImages = [];
     for (const file of req.files) {
-      const imageUrl = `/uploads/${file.filename}`;
+      const imageUrl = file.path; // الرابط السحابي القادم مباشرة من Cloudinary
       const result = await db.query(
         'INSERT INTO project_images (album_id, image_url) VALUES ($1, $2) RETURNING *',
         [albumId, imageUrl]
@@ -167,10 +168,10 @@ app.delete('/api/albums/:id', authenticateAdmin, async (req, res) => {
   }
 });
 
-// 7. إرسال طلب استشارة / مخطط مشروع من قبل العميل (Public)
+// 7. إرسال طلب الاستشارة / مخطط مشروع من قبل العميل (Public - Cloudinary)
 app.post('/api/quote-requests', upload.single('blueprint'), async (req, res) => {
   const { client_name, phone, notes } = req.body;
-  const file_url = req.file ? `/uploads/${req.file.filename}` : null;
+  const file_url = req.file ? req.file.path : null; // استخدام الرابط السحابي المباشر للمخطط
 
   if (!client_name || !phone) {
     return res.status(400).json({ error: 'اسم العميل ورقم الهاتف مطلوبان' });
@@ -186,8 +187,6 @@ app.post('/api/quote-requests', upload.single('blueprint'), async (req, res) => 
     res.status(500).json({ error: err.message });
   }
 });
-
-// تشغيل السيرفر
 app.listen(PORT, () => {
   console.log(`🚀 الخادم يعمل بنجاح على المنفذ: http://localhost:${PORT}`);
 });
